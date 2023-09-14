@@ -1,0 +1,20 @@
+version: '3.4'
+services:
+  postgres-service:
+    image: 'postgres:13-alpine'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -h localhost -p 5432 -U root -d pharmacy',
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=pharmacy
+    stop_signal: SIGKILL

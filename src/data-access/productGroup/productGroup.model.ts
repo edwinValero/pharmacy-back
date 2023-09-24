@@ -7,12 +7,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
+  ManyToOne,
 } from 'typeorm';
-import { ProductGroupModel } from '../productGroup/productGroup.model';
+import { ProductModel } from '../product/product.model';
 
-@Entity({ name: 'product' })
-export class ProductModel extends BaseEntity {
+@Entity({ name: 'productGroup' })
+export class ProductGroupModel extends BaseEntity {
   @ApiResponseProperty()
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -22,18 +22,17 @@ export class ProductModel extends BaseEntity {
   name: string;
 
   @ApiResponseProperty()
-  @Column({ name: 'tax', type: 'decimal' })
-  tax: number;
+  @Column({ name: 'amount', type: 'int' })
+  amount: number;
 
   @ApiResponseProperty()
-  @Column({ name: 'barcode', type: 'varchar' })
-  barcode: string;
+  @Column({ name: 'salePrice', type: 'decimal' })
+  salePrice: number;
 
-  @OneToMany(
-    () => ProductGroupModel,
-    (productGroupModel) => productGroupModel.product,
-  )
-  groups: ProductGroupModel[];
+  @ManyToOne(() => ProductModel, (product) => product.groups, {
+    nullable: false,
+  })
+  product: ProductModel;
 
   @ApiResponseProperty()
   @CreateDateColumn({ name: 'createdDate', type: 'timestamptz' })

@@ -7,8 +7,8 @@ export default class ProductSeeder implements Seeder {
     dataSource: DataSource,
     factoryManager: SeederFactoryManager,
   ): Promise<any> {
-    const userFactory = factoryManager.get(ProductModel);
+    const productFactory = factoryManager.get(ProductModel);
     // save 5 factory generated entities, to the database
-    await userFactory.saveMany(5);
+    await productFactory.saveMany(5);
   }
 }

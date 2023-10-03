@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { ProductGroupModel } from '../productGroup/productGroup.model';
 
@@ -22,16 +23,18 @@ export class ProductModel extends BaseEntity {
   name: string;
 
   @ApiResponseProperty()
+  @Index()
   @Column({ name: 'tax', type: 'decimal' })
   tax: number;
 
   @ApiResponseProperty()
-  @Column({ name: 'barcode', type: 'varchar' })
+  @Column({ name: 'barcode', type: 'varchar', unique: true })
   barcode: string;
 
   @OneToMany(
     () => ProductGroupModel,
     (productGroupModel) => productGroupModel.product,
+    { cascade: true },
   )
   groups: ProductGroupModel[];
 

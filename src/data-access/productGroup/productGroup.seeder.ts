@@ -1,4 +1,4 @@
-import { Seeder, SeederFactoryManager,  } from 'typeorm-extension';
+import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
 import { ProductGroupModel } from './productGroup.model';
 import { ProductModel } from '../product/product.model';

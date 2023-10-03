@@ -8,10 +8,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  Unique,
 } from 'typeorm';
 import { ProductModel } from '../product/product.model';
 
 @Entity({ name: 'productGroup' })
+@Unique(['name', 'product'])
 export class ProductGroupModel extends BaseEntity {
   @ApiResponseProperty()
   @PrimaryGeneratedColumn({ name: 'id' })

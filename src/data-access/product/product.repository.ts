@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ProductModel } from './product.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 export class CreateProductParams {
   name: string;
   tax: number;
-  barCode: string;
+  barcode: string;
 }
 
 @Injectable()
@@ -19,15 +19,21 @@ export class ProductRepository {
 
   async createProduct(
     productParams: CreateProductParams,
-    @TransactionManager() transactionManager: EntityManager = null,
+    transactionManager: EntityManager = null,
   ): Promise<ProductModel> {
     this.logger.debug(
       `About to create a new product: ${JSON.stringify(productParams)}`,
     );
 
+    const mgr: EntityManager = transactionManager
+      ? transactionManager
+      : this.productRepository.manager;
+
     const newProduct = new ProductModel();
     newProduct.name = productParams.name;
     newProduct.tax = productParams.tax;
-    newProduct.barcode = productParams.barCode;
+    newProduct.barcode = productParams.barcode;
+
+    return mgr.save(newProduct);
   }
 }

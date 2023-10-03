@@ -12,31 +12,28 @@ import { Request, Response } from 'express';
 export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     Logger.error(exception.stack);
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const context = host.switchToHttp();
+    const response = context.getResponse<Response>();
+    const request = context.getRequest<Request>();
 
-    let extractedStatusCode: HttpStatus;
-    let extractedMessage: string;
+    let exceptionStatusCode: HttpStatus;
+    let exceptionMessage: string;
 
     if (exception instanceof HttpException) {
       const httpException = exception as HttpException;
-      extractedStatusCode = httpException.getStatus();
+      exceptionStatusCode = httpException.getStatus();
       const httpErrorData = httpException.getResponse() as any;
-      extractedMessage = httpErrorData?.message;
+      exceptionMessage = httpErrorData?.message;
     }
 
-    const statusCode = extractedStatusCode || HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = extractedMessage || exception.message;
-
-    let completeExceptionMessage = message;
+    const statusCode = exceptionStatusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+    const message = exceptionMessage || exception.message;
+    let finalMessage = message;
 
     if (request.body && Object.keys(request.body)?.length > 0) {
-      completeExceptionMessage += ` --- Request Body: ${JSON.stringify(
-        request.body,
-      )}`;
+      finalMessage += ` ---> request payload: ${JSON.stringify(request.body)}`;
     }
-    exception.message = completeExceptionMessage;
+    exception.message = finalMessage;
 
     response.status(statusCode).json({
       statusCode,

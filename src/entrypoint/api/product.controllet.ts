@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Injectable,
   Post,
+  Query,
   UseFilters,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -45,7 +47,18 @@ export class ProductController {
     description: 'Returns product and groups',
   })
   async createProduct(@Body() body: ProductPostRequestDto) {
-    debugger;
     return this.productUseCase.createProductWithGroups(body);
+  }
+
+  @Get()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns products and groups',
+  })
+  async getProducts(
+    @Query('limit') limit: number = 100,
+    @Query('offset') offset: number = 0,
+  ) {
+    return this.productUseCase.getProducts(limit, offset);
   }
 }

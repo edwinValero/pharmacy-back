@@ -132,6 +132,7 @@ export class ProductUseCase {
         queryRunner.manager,
       );
       return {
+        count: productsDetails.length,
         total,
         offset,
         limit,

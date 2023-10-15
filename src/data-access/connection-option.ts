@@ -11,4 +11,5 @@ export const connectionOptions: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD || 'dummy_password',
   database: process.env.DB_NAME || 'dummy_db_name',
   entities: [ProductModel, ProductGroupModel],
+  logging: true,
 };

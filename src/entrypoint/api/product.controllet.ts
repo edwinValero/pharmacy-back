@@ -4,12 +4,18 @@ import {
   Get,
   HttpStatus,
   Injectable,
+  Param,
+  Patch,
   Post,
   Query,
   UseFilters,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ProductPostRequestDto } from './dto/product.request';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ProductPatchRequestDto,
+  ProductPathRequest,
+  ProductPostRequestDto,
+} from './dto/product.request';
 import { ProductUseCase } from 'src/domain/use-case/product';
 import { ApiExceptionFilter } from 'src/error-handling/api-error-handling';
 
@@ -60,5 +66,22 @@ export class ProductController {
     @Query('offset') offset: number = 0,
   ) {
     return this.productUseCase.getProducts(limit, offset);
+  }
+
+  @Patch(':productId')
+  @ApiParam({
+    name: 'productId',
+    required: true,
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns products and groups updated',
+  })
+  async updateProduct(
+    @Body() body: ProductPatchRequestDto,
+    @Param() params: ProductPathRequest,
+  ) {
+    return this.productUseCase.patchProductWithGroups(body, params.productId);
   }
 }

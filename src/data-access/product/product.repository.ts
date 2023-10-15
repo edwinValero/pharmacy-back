@@ -90,7 +90,7 @@ export class ProductRepository {
   async getTotalProducts(
     transactionManager: EntityManager = null,
   ): Promise<number> {
-    this.logger.debug(`About to get total product`);
+    this.logger.debug('About to get total product');
 
     const mgr: EntityManager = transactionManager
       ? transactionManager

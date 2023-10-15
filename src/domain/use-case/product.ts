@@ -59,7 +59,7 @@ export class ProductUseCase {
     return productDetail;
   }
 
-  async patchProductWithGroups(
+  async patchProduct(
     product: ProductPatchRequestDto,
     productId: number,
   ): Promise<ProductDetail> {
@@ -107,6 +107,12 @@ export class ProductUseCase {
   ) {
     try {
       const groups = product.groups.map((group) => {
+        if (group.amount <= 0) {
+          throw new HttpException(
+            'Error: bad arguments, amount can not be 0 or less',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
         const newGroup = {
           name: group.name,
           amount: group.amount,
@@ -148,6 +154,8 @@ export class ProductUseCase {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
 
+    let productsDetails: ProductDetail[];
+    let total = 0;
     try {
       const products = await this.productRepository.getProductsWithGroups(
         limit,
@@ -155,7 +163,7 @@ export class ProductUseCase {
         queryRunner.manager,
       );
 
-      const productsDetails = products.map((model) => {
+      productsDetails = products.map((model) => {
         const groups: GroupDetail[] = model.groups.map((modelGroup) => {
           return {
             id: modelGroup.id,
@@ -175,21 +183,22 @@ export class ProductUseCase {
         return product;
       });
 
-      const total = await this.productRepository.getTotalProducts(
+      total = await this.productRepository.getTotalProducts(
         queryRunner.manager,
       );
-      return {
-        count: productsDetails.length,
-        total,
-        offset,
-        limit,
-        items: productsDetails,
-      };
     } catch (e) {
       await queryRunner.rollbackTransaction();
       throw e;
     } finally {
       await queryRunner.release();
     }
+
+    return {
+      count: productsDetails.length,
+      total,
+      offset,
+      limit,
+      items: productsDetails,
+    };
   }
 }

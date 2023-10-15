@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -20,12 +21,12 @@ export class ProductGroupPostRequestDto {
   name: string;
 
   @ApiProperty({
-    description: 'Should be a amount',
+    description: 'Should be a amount integer bigger than 0',
     required: true,
     type: Number,
     name: 'amount',
   })
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
   amount: number;
 

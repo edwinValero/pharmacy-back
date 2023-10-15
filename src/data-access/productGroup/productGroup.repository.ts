@@ -42,4 +42,25 @@ export class ProductGroupRepository {
 
     return mgr.save(ProductGroupModel, newGroups);
   }
+
+  async createProductGroup(
+    productGroup: CreateProductGroupParams,
+    transactionManager: EntityManager = null,
+  ): Promise<ProductGroupModel> {
+    this.logger.debug(
+      `About to create a new group: ${JSON.stringify(productGroup)}`,
+    );
+
+    const mgr: EntityManager = transactionManager
+      ? transactionManager
+      : this.productGroupRepository.manager;
+
+    const newProductGroup = new ProductGroupModel();
+    newProductGroup.name = productGroup.name;
+    newProductGroup.amount = productGroup.amount;
+    newProductGroup.salePrice = productGroup.salePrice;
+    newProductGroup.product = productGroup.product;
+
+    return mgr.save(newProductGroup);
+  }
 }

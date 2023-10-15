@@ -76,12 +76,12 @@ export class ProductController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Returns products and groups updated',
+    description: 'Returns product updated',
   })
   async updateProduct(
     @Body() body: ProductPatchRequestDto,
     @Param() params: ProductPathRequest,
   ) {
-    return this.productUseCase.patchProductWithGroups(body, params.productId);
+    return this.productUseCase.patchProduct(body, params.productId);
   }
 }

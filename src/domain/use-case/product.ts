@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ProductModel } from 'src/data-access';
 import { ProductRepository } from 'src/data-access/product/product.repository';
 import { ProductGroupRepository } from 'src/data-access/productGroup/productGroup.repository';
-import { ProductPostRequestDto } from 'src/entrypoint/api/dto/product.request';
+import {
+  ProductPatchRequestDto,
+  ProductPostRequestDto,
+} from 'src/entrypoint/api/dto/product.request';
 import { throwErrorsWithUniqueConstraints } from 'src/error-handling/helper';
 import { GroupDetail } from 'src/type/groupDetail';
 import { ProductDetail } from 'src/type/productDetail';
@@ -31,18 +34,21 @@ export class ProductUseCase {
         queryRunner,
       );
 
-      productDetail.id = productModel.id;
-      productDetail.name = productModel.name;
-      productDetail.tax = productModel.tax;
-      productDetail.barcode = productModel.barcode;
-      productDetail.groups = groups.map((group) => {
-        return {
-          id: group.id,
-          name: group.name,
-          amount: group.amount,
-          salePrice: group.salePrice,
-        };
-      });
+      productDetail = {
+        id: productModel.id,
+        name: productModel.name,
+        tax: productModel.tax,
+        barcode: productModel.barcode,
+        groups: groups.map((group) => {
+          return {
+            id: group.id,
+            name: group.name,
+            amount: group.amount,
+            salePrice: group.salePrice,
+          };
+        }),
+      };
+      await queryRunner.commitTransaction();
     } catch (e) {
       await queryRunner.rollbackTransaction();
       throw e;
@@ -50,6 +56,47 @@ export class ProductUseCase {
       await queryRunner.release();
     }
 
+    return productDetail;
+  }
+
+  async patchProductWithGroups(
+    product: ProductPatchRequestDto,
+    productId: number,
+  ): Promise<ProductDetail> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    let productDetail: ProductDetail;
+    try {
+      const dbProduct = await queryRunner.manager.findOneBy(ProductModel, {
+        id: productId,
+      });
+      if (dbProduct === null) {
+        throw new HttpException(
+          `Error: bad arguments, productId:${productId} does not exist`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      dbProduct.barcode = product.barcode;
+      dbProduct.name = product.name;
+      dbProduct.tax = product.tax;
+
+      const productModel = await queryRunner.manager.save(dbProduct);
+
+      productDetail = {
+        id: productModel.id,
+        name: productModel.name,
+        tax: productModel.tax,
+        barcode: productModel.barcode,
+      };
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await queryRunner.release();
+    }
     return productDetail;
   }
 

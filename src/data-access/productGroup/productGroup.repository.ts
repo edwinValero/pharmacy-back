@@ -24,7 +24,7 @@ export class ProductGroupRepository {
     transactionManager: EntityManager = null,
   ): Promise<ProductGroupModel[]> {
     this.logger.debug(
-      `About to create a new product: ${JSON.stringify(productGroups)}`,
+      `About to create a new groups: ${JSON.stringify(productGroups)}`,
     );
 
     const mgr: EntityManager = transactionManager

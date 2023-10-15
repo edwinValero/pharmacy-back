@@ -82,3 +82,40 @@ export class ProductPostRequestDto {
   @Type(() => ProductGroupPostRequestDto)
   groups: ProductGroupPostRequestDto[];
 }
+
+export class ProductPatchRequestDto {
+  @ApiProperty({
+    description: 'Should be a name',
+    required: true,
+    type: String,
+    name: 'name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({
+    description: 'Should be a tax',
+    required: true,
+    type: Number,
+    name: 'tax',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  tax: number;
+
+  @ApiProperty({
+    description: 'Should be a bar code',
+    required: true,
+    type: String,
+    name: 'barcode',
+  })
+  @IsString()
+  @IsNotEmpty()
+  barcode: string;
+}
+
+export class ProductPathRequest {
+  @IsNotEmpty()
+  productId: number;
+}

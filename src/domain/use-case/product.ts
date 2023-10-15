@@ -4,6 +4,7 @@ import { ProductRepository } from 'src/data-access/product/product.repository';
 import { ProductGroupRepository } from 'src/data-access/productGroup/productGroup.repository';
 import { ProductPostRequestDto } from 'src/entrypoint/api/dto/product.request';
 import { throwErrorsWithUniqueConstraints } from 'src/error-handling/helper';
+import { GroupDetail } from 'src/type/groupDetail';
 import { ProductDetail } from 'src/type/productDetail';
 import { DataSource, QueryRunner } from 'typeorm';
 
@@ -15,7 +16,9 @@ export class ProductUseCase {
     private readonly dataSource: DataSource,
   ) {}
 
-  async createProductWithGroups(product: ProductPostRequestDto) {
+  async createProductWithGroups(
+    product: ProductPostRequestDto,
+  ): Promise<ProductDetail> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
 
@@ -91,6 +94,55 @@ export class ProductUseCase {
       return result;
     } catch (e) {
       throwErrorsWithUniqueConstraints(e, 'Product');
+    }
+  }
+
+  async getProducts(limit: number, offset: number) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      const products = await this.productRepository.getProductsWithGroups(
+        limit,
+        offset,
+        queryRunner.manager,
+      );
+
+      const productsDetails = products.map((model) => {
+        const groups: GroupDetail[] = model.groups.map((modelGroup) => {
+          return {
+            id: modelGroup.id,
+            name: modelGroup.name,
+            amount: modelGroup.amount,
+            salePrice: modelGroup.salePrice,
+          };
+        });
+
+        const product: ProductDetail = {
+          id: model.id,
+          name: model.name,
+          tax: model.tax,
+          barcode: model.barcode,
+          groups: groups,
+        };
+        return product;
+      });
+
+      const total = await this.productRepository.getTotalProducts(
+        queryRunner.manager,
+      );
+      return {
+        count: productsDetails.length,
+        total,
+        offset,
+        limit,
+        items: productsDetails,
+      };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await queryRunner.release();
     }
   }
 }

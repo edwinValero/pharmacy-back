@@ -8,11 +8,13 @@ import { ProductRepository } from './data-access/product/product.repository';
 import { ProductGroupRepository } from './data-access/productGroup/productGroup.repository';
 import { GroupController } from './entrypoint/api/group.controller';
 import { GroupUseCase } from './domain/use-case/group';
+import { AuthzModule } from './authz/authz.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(connectionOptions),
     TypeOrmModule.forFeature([ProductModel, ProductGroupModel]),
+    AuthzModule,
   ],
   controllers: [ProductController, GroupController],
   providers: [

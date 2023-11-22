@@ -9,8 +9,15 @@ import {
   Post,
   Query,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   ProductPatchRequestDto,
   ProductPathRequest,
@@ -18,11 +25,14 @@ import {
 } from './dto/product.request';
 import { ProductUseCase } from 'src/domain/use-case/product';
 import { ApiExceptionFilter } from 'src/error-handling/api-error-handling';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Product')
 @Controller('product')
 @Injectable()
 @UseFilters(ApiExceptionFilter)
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class ProductController {
   constructor(private readonly productUseCase: ProductUseCase) {}
 

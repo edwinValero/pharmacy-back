@@ -8,8 +8,15 @@ import {
   Patch,
   Post,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProductGroupPostRequestDto } from './dto/product.request';
 import { ApiExceptionFilter } from 'src/error-handling/api-error-handling';
 import { GroupUseCase } from 'src/domain/use-case/group';
@@ -18,10 +25,13 @@ import {
   GroupPatchRequestDto,
   GroupRequest,
 } from './dto/group.request';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Group')
 @Controller('group')
 @Injectable()
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 @UseFilters(ApiExceptionFilter)
 export class GroupController {
   constructor(private readonly groupUseCase: GroupUseCase) {}

@@ -68,3 +68,8 @@ $ npm run test:cov
 ```bash
 $ npm run seed
 ```
+## Libraries and technologies
+
+nestjs, swagger, typeorm, typescript, docker, postgreSQL, data seed
+
+
